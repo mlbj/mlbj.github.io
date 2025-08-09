@@ -1,0 +1,18 @@
+baseURL: "https://mlbj.github.io/"
+languageCode: "en-us"
+title: "Mauro Luiz Brandão Junior"
+theme: "PaperMod"
+
+params:
+  disableThemeToggle: true
+  defaultTheme: light
+
+menu:
+  main:
+    - name: "About"
+      url: "/about/"
+      weight: 2
+    - name: "Blog"
+      url: "/posts/"
+      weight: 1
+
