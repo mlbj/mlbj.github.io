@@ -6,6 +6,7 @@ theme: "PaperMod"
 params:
   disableThemeToggle: true
   defaultTheme: light
+  hideFooter: true
 
 menu:
   main:

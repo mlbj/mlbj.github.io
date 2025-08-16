@@ -71,24 +71,34 @@ using StateGraph = std::unordered_map<State, StateSet, StateHash>;
 
 In order to expand the content of the graph, we perform a Breadth-First Search (BFS), which explores all neighbors of each state before moving on to the next, ensuring that states are visited in order of increasing “distance” from the starting state.
 ```C++
-void expand_graph(StateGraph& g, State start){
+void expand(StateGraph& g, State start){
     std::queue<State> q;
     q.push(start);
  
-    while (!q.empty()) {
-        State s = q.front();
+    while (!q.empty()){
+        State current = q.front();
         q.pop();
  
         std::vector<State> neighbors = {
-            f4(s), f7(s), e4(s), e7(s), d47(s), d74(s)
+            f4(current), 
+            f7(current), 
+            e4(current), 
+            e7(current), 
+            d47(current), 
+            d74(current)
         };
  
-        for (auto& ns : neighbors){
-            if (g.find(ns) == g.end()){
-                g[ns] = {
-                    f4(ns), f7(ns), e4(ns), e7(ns), d47(ns), d74(ns)
+        for (auto& neighbor : neighbors){
+            if (g.find(neighbor) == g.end()){
+                g[neighbor] = {
+                    f4(neighbor), 
+                    f7(neighbor), 
+                    e4(neighbor), 
+                    e7(neighbor), 
+                    d47(neighbor), 
+                    d74(neighbor)
                 };
-                q.push(ns);
+                q.push(neighbor);
             }
         }
     }
@@ -96,9 +106,9 @@ void expand_graph(StateGraph& g, State start){
 ```
 
 
-Starting from `(0,0)` and its neighbors, we use `expand_graph` to populate all reachable states in an empty graph.
+Starting from `(0,0)` and its neighbors, we use `expand` to populate all reachable states in an empty graph.
 ```C++
-int main() {
+int main(){
     StateGraph g;
 
     State zero_state = {0, 0};
@@ -111,7 +121,7 @@ int main() {
         d74(zero_state)
     };
 
-    expand_graph(g, zero_state);
+    expand(g, zero_state);
 }
 ```
 
@@ -172,6 +182,7 @@ std::vector<State> shortest_path(const StateGraph& g,
     reverse(path.begin(), path.end());
 
     return path;
+}
 ```
 
 
