@@ -5,9 +5,9 @@ tags: ["graphs", "c++"]
 draft: false
 ---
 
-One of these days a friend mentioned this internet puzzle, which can be stated as follows: _You have two buckets. One bucket with capacity of 4 L, and another with 7 L. Using only these two buckets, you are asked to obtain exactly 6 L of water._ The problem also establishes two rules, namely:
-1. _You have infinite water, and can waste it as much as you want._ 
-2. _You can move water from one bucket to another, but only in a way that at least one of the two buckets ends up either empty or full._ 
+One of these days a friend mentioned this internet puzzle, which can be stated as follows: _You have two buckets. One bucket with a capacity of 4 L, and another with 7 L. Using only these two buckets, you are asked to obtain exactly 6 L of water._ The problem establishes that _you have infinite water, and can waste as much of it as you want, as long as you respect the two following rules_ 
+1. _When filling up a bucket or throwing its contents away, you have to fill it up completely, or empty it completely, respectively._ 
+2. _You can move water from one bucket to another, but only in such a way that at least one of the two buckets ends up either empty or full._ 
 
 Although we could inspect a solution using basic arithmetic reasoning, we can also think of this puzzle as an exercise in graph theory. At any given instant, we can represent the content of the buckets as an ordered pair `(x,y)`, that is
 ```C++
