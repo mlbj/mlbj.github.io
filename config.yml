@@ -13,7 +13,7 @@ menu:
     - name: "About"
       url: "/about/"
       weight: 2
-    - name: "Archive"
-      url: "/archives/"
-      weight: 1
+#            - name: "Archive"
+#      url: "/archives/"
+#      weight: 1
 
