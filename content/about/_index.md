@@ -1,5 +1,5 @@
 ---
-title: "About Me"
+title: ""
 ---
 
 Mauro Luiz Brandão Junior
