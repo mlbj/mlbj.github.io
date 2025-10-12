@@ -1,7 +1,7 @@
 ---
 title: "(4,7) buckets"
 date: 2025-08-16
-tags: ["graphs", "c++"]
+tags: ["graphs", "cpp"]
 draft: false
 ---
 
