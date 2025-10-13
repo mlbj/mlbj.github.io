@@ -1,0 +1,21 @@
+{{- define "main" }}
+<header class="page-header">
+  {{- partial "breadcrumbs.html" . }}
+  <h1 style="font-size: 1.5rem;">
+    {{- .Title | lower }}
+  </h1>
+</header>
+
+<div class="post-content">
+  {{- .Content }}
+</div>
+
+<ul class="post-list">
+  {{- range .Pages }}
+    <li>
+      <a href="{{ .Permalink }}">{{ .Title }}</a>
+    </li>
+  {{- end }}
+</ul>
+{{- end }}
+
