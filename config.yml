@@ -7,6 +7,7 @@ params:
   disableThemeToggle: true
   defaultTheme: light
   hideFooter: true
+  math: true
 
 menu:
   main:
