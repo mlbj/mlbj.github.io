@@ -18,3 +18,7 @@ menu:
 #      url: "/archives/"
 #      weight: 1
 
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
