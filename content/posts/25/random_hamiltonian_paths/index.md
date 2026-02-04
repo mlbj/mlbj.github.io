@@ -72,7 +72,7 @@ bool backtrack(Point start,
 	path.push_back(std::make_pair(start.first, start.second));
 
 	// Check if we found a complete valid path
-	if (path.size() == static_cast<size_t>(width * height)){
+	if (path.size() == width*height){
 		if (!target_end.empty()){
 			// Check if path satisfies target end constraint
 			for (const auto& [ty, tx] : target_end){
@@ -255,7 +255,7 @@ Points sample_path_pyramid(const Points& lowres_path,
 
     Grid subgrid(subgrid_m, subgrid_n, {0,0});
     
-    for (size_t i=0; i<lowres_path.size(); i++){
+    for (int i=0; i<lowres_path.size(); i++){
         int lowres_y = lowres_path[i].first;
         int lowres_x = lowres_path[i].second;
         subgrid.bias = {lowres_y*subgrid_m, lowres_x*subgrid_n};
@@ -451,7 +451,9 @@ void backbite(Points& path,
 
     // Find bite position in the path
     auto it = std::find(path.begin(), path.end(), std::make_pair(bite_y, bite_x));
-    if (it == path.end()) return;
+    if (it == path.end()){
+        return;
+    }
 
     // If biting from the front: reverse beginning..before(it)
     if (end_index == 0){
