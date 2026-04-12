@@ -1,5 +1,5 @@
 ---
-title: "Sampling random Hamiltonian paths on a grid"
+title: "Generating random Hamiltonian paths on a grid"
 date: 2025-11-30
 tags: ["statistics", "graphs", "cpp"]
 draft: false
@@ -55,7 +55,7 @@ public:
 
 ### 1. Backtracking
 
-Sampling random uniformly distributed Hamiltonian paths in a grid is more complicated than it seems. A natural first idea is to walk randomly over it, backtracking upon reaching a dead end. To implement this, we maintain a boolean matrix  `std::vector<std::vector<bool>> visited` to record which vertices have already been explored, while `Points path` actually stores the sequence of visited coordinates. We also allow an optional constraint on the ending positions, represented as a vector of coordinates `Points target_end`. 
+Producing random uniformly distributed Hamiltonian paths in a grid is more complicated than it seems. A natural first idea is to walk randomly over it, backtracking upon reaching a dead end. To implement this, we maintain a boolean matrix  `std::vector<std::vector<bool>> visited` to record which vertices have already been explored, while `Points path` actually stores the sequence of visited coordinates. We also allow an optional constraint on the ending positions, represented as a vector of coordinates `Points target_end`. 
 
 ```C++
 // A Backtracking function
@@ -117,7 +117,7 @@ bool backtrack(Point start,
 }
 
 // A wrapper to the backtracking function
-Points sample_path(Point start, 
+Points gen_path(Point start, 
 				   const Points& target_end = {}){
 
 	std::vector<std::vector<bool>> visited;
@@ -141,15 +141,15 @@ Unfortunately, although the method works as intended, its runtime is terrible. I
 
 ### 2. Pyramid construction
 
-So, backtracking runs in exponential time, which makes it inefficient. However, it is not useless: for very small grids, the algorithm behaves as if its execution time were linear. In this section we try to explore that. Recall that our backtracking implementation takes a `target_end` constraint, which represent a region of the grid where the path is required to end. Constraining the endpoint to a single coordinate may be too restrictive, but we can reasonably restrict it for an entire side of the grid (`top`, `bottom`, `left`, `right`), without significantly affecting performance. To support this in a simple way, we  can write another implementation of `sample_path` function that parses an `end_side` string and calls the previously defined wrapper. 
+So, backtracking runs in exponential time, which makes it inefficient. However, it is not useless: for very small grids, the algorithm behaves as if its execution time were linear. In this section we try to explore that. Recall that our backtracking implementation takes a `target_end` constraint, which represent a region of the grid where the path is required to end. Constraining the endpoint to a single coordinate may be too restrictive, but we can reasonably restrict it for an entire side of the grid (`top`, `bottom`, `left`, `right`), without significantly affecting performance. To support this in a simple way, we  can write another implementation of `gen_path` function that parses an `end_side` string and calls the previously defined wrapper. 
 ```C++
 // Alternative wrapper to find a random path using an end_side string
-Points sample_path(Point start,
-				   const std::string& end_side){
+Points gen_path(Point start,
+		        const std::string& end_side){
 
 	Points target_end;
 
-	// Parse end_side to sample target_end positions
+	// Parse end_side to generate target_end positions
 	if (end_side == "top"){
 		int y = bias.first;  // topmost row
 		for (int x=bias.second; x<bias.second+width; x++) {
@@ -178,11 +178,11 @@ Points sample_path(Point start,
 		}
 	}
 	else if (end_side == "any"){
-		return sample_path(start);
+		return gen_path(start);
 	}
 
-	// Sample path
-	return sample_path(start, target_end);
+	// Generate path
+	return gen_path(start, target_end);
 }
 ```
 
@@ -194,57 +194,57 @@ Points path_swap, path;
 Grid subgrid(6,6, start);
 
 // First subgrid (0,0) to (0,1)
-path = subgrid.sample_path(start, "right");
+path = subgrid.gen_path(start, "right");
 
 // Second subgrid (0,1) to (0,2) 
 subgrid.bias = {0*6, 1*6};
 start = path.back();
 start.second++;
-path_swap = subgrid.sample_path(start, "right");
+path_swap = subgrid.gen_path(start, "right");
 path.insert(path.end(), path_swap.begin(), path_swap.end());
 
 // Third subgrid (0,2) to (1,2) 
 subgrid.bias = {0*6, 2*6}; 
 start = path.back();
 start.second++;
-path_swap = subgrid.sample_path(start, "bottom");
+path_swap = subgrid.gen_path(start, "bottom");
 path.insert(path.end(), path_swap.begin(), path_swap.end());
 
 // Fourth subgrid (1,2) to (1,1) 
 subgrid.bias = {1*6, 2*6}; 
 start = path.back();
 start.first++;
-path_swap = subgrid.sample_path(start, "left");
+path_swap = subgrid.gen_path(start, "left");
 path.insert(path.end(), path_swap.begin(), path_swap.end());
 
 // Fifth subgrid (1,1) to (1,0) 
 subgrid.bias = {1*6, 1*6};
 start = path.back();
 start.second--;
-path_swap = subgrid.sample_path(start, "left");
+path_swap = subgrid.gen_path(start, "left");
 path.insert(path.end(), path_swap.begin(), path_swap.end());
 
 // Sixth subgrid (1,0) to (0,0) 
 subgrid.bias = {1*6, 0*6};
 start = path.back();
 start.second--;
-path_swap = subgrid.sample_path(start, "any");
+path_swap = subgrid.gen_path(start, "any");
 path.insert(path.end(), path_swap.begin(), path_swap.end());
 ```
 
-Notice the iterative aspect of this construction. The random paths in each $6 \times 6$ grid were connected along an underlying deterministic path on a $2 \times 3$ super-grid.  Using this approach, we obtain a Hamiltonian path on a $12 \times 18$ grid. The Figure below shows a path sampled in this manner, with alternating colors to highlight each joining step.
+Notice the iterative aspect of this construction. The random paths in each $6 \times 6$ grid were connected along an underlying deterministic path on a $2 \times 3$ super-grid.  Using this approach, we obtain a Hamiltonian path on a $12 \times 18$ grid. The Figure below shows a path generated in this manner, with alternating colors to highlight each joining step.
 
 <div style="text-align:center;">
   <figure style="max-width:700px; margin: 0 auto;">
     <img src="walk_pyramid_example.png" alt="Expanded graph" style="width:100%;">
-    <figcaption>Joining randomly sampled Hamiltonian paths</figcaption>
+    <figcaption>Joining randomly generated Hamiltonian paths</figcaption>
   </figure>
 </div>
 
 
 Generalizing this idea, we can write a function that takes a path on a “low resolution” grid and follows it point by point, backtracking random paths at each location and joining them to produce a random Hamiltonian path on a “higher resolution” grid.
 ```C++
-Points sample_path_pyramid(const Points& lowres_path,
+Points gen_path_pyramid(const Points& lowres_path,
                            int lowres_m, int lowres_n,
                            int subgrid_m, int subgrid_n,
                            std::mt19937& rng){
@@ -278,7 +278,7 @@ Points sample_path_pyramid(const Points& lowres_path,
             end_side = "any";
         }   
 
-        // sample path in subgrid
+        // Generate path in subgrid
         subgrid_path.clear();
         while(subgrid_path.empty()){
             // Find a starting position at the edge of the subgrid
@@ -319,8 +319,8 @@ Points sample_path_pyramid(const Points& lowres_path,
                 start.second = possible_starts[rand_index].second;
             }
 
-            // sample path in subgrid
-            subgrid_path = subgrid.sample_path(start, end_side);
+            // Generate path in subgrid
+            subgrid_path = subgrid.gen_path(start, end_side);
         }
         
         full_path.insert(full_path.end(), subgrid_path.begin(), subgrid_path.end());
@@ -330,7 +330,7 @@ Points sample_path_pyramid(const Points& lowres_path,
 }
 ```
 
-At each position of  the input `lowres_path`, the function `sample_path_pyramid`  creates a random Hamiltonian path by backtracking over the  smaller `subgrid_m` $\times$ `subgrid_n` grid, using appropriate `start` positions and `target_end` constraints. These subgrid paths are then joined together following `lowres_path`, yielding a final path on a grid of size `lowres_m` `subgrid_m` $\times$ `lowres_n` `subgrid_n` sized grid. By calling this function iteratively with appropriately chosen dimensions, we can generate a Hamiltonian path of any desired size. For example, the snippet below shows how to create a path on a `128` $\times$ `128` grid. 
+At each position of  the input `lowres_path`, the function `gen_path_pyramid`  creates a random Hamiltonian path by backtracking over the  smaller `subgrid_m` $\times$ `subgrid_n` grid, using appropriate `start` positions and `target_end` constraints. These subgrid paths are then joined together following `lowres_path`, yielding a final path on a grid of size `lowres_m` `subgrid_m` $\times$ `lowres_n` `subgrid_n` sized grid. By calling this function iteratively with appropriately chosen dimensions, we can generate a Hamiltonian path of any desired size. For example, the snippet below shows how to create a path on a `128` $\times$ `128` grid. 
 ```C++
 std::mt19937 rng(std::random_device{}());
 int lowres_m, lowres_n, subgrid_m, subgrid_n;
@@ -354,7 +354,7 @@ for (const auto& dim : mn){
 }
 
 Grid grid(mn[0].first, mn[0].second, {0,0});
-path = grid.sample_path({0,0});
+path = grid.gen_path({0,0});
 
 for (uint8_t level=1; level<mn.size(); level++){
 	lowres_m = mn[level-1].first;
@@ -362,7 +362,7 @@ for (uint8_t level=1; level<mn.size(); level++){
 	subgrid_m = mn[level].first;
 	subgrid_n = mn[level].second;
 
-	path_swap = sample_path_pyramid(path,
+	path_swap = gen_path_pyramid(path,
 									lowres_m, lowres_n,
 									subgrid_m, subgrid_n,
 									rng);
@@ -371,11 +371,11 @@ for (uint8_t level=1; level<mn.size(); level++){
 }
 ```
 
-Is a path generated by `sample_path_pyramid` random? In a sense, yes,  but is it uniformly distributed? Definitely not. Uniformity here is related to having each possible edge being taken with the same probability. And are all Hamiltonian paths reachable by this method? Again, no. The pyramid construction selects only one joining edge at each junction, and not every Hamiltonian path on a finer grid can be decomposed into paths on smaller, equally sized subgrids. In other words, some valid random paths can never be produced by this method, and the ones that are produced are heavily biased.
+Is a path generated by `gen_path_pyramid` random? In a sense, yes,  but is it uniformly distributed? Definitely not. Uniformity here is related to having each possible edge being taken with the same probability. And are all Hamiltonian paths reachable by this method? Again, no. The pyramid construction selects only one joining edge at each junction, and not every Hamiltonian path on a finer grid can be decomposed into paths on smaller, equally sized subgrids. In other words, some valid random paths can never be produced by this method, and the ones that are produced are heavily biased.
 
 ### 3. Backbiting
 
-As we have just argued, the procedure described in the previous section neither generates uniformly random Hamiltonian paths nor is capable of producing all possible Hamiltonian paths on the grid. One way to highlight these problems of the sampler is to examine how often each edge of the grid is used after generating a large number of samples. If the algorithm was uniform, then we would expect that every edge would be visited roughly the same number of times.
+As we have just argued, the procedure described in the previous section neither generates uniformly random Hamiltonian paths nor is capable of producing all possible Hamiltonian paths on the grid. One way to highlight these problems of the algorithm is to examine how often each edge of the grid is used after generating a large number of realizations. If the algorithm was uniform, then we would expect that every edge would be visited roughly the same number of times.
 
 The visualization below was produced by repeatedly generating Hamiltonian paths on an $8 \times 8$ grid using the iterative construction described earlier with `mn = {{2,2}, {2,2}, {2,2}}`. We ran this procedure $64^3$ times, and counted how many times each edge was used. A line was drawn for every traversal of each edge, with its thickness proportional to the number of visits. The resulting plot reveals a strong spatial bias as expected: some edges are traversed far more frequently than others.
 <div style="text-align:center;">
@@ -387,7 +387,7 @@ The visualization below was produced by repeatedly generating Hamiltonian paths 
 
 Although I'm not sure whether this edge-counting strategy is sufficient to indicate that the distribution is uniform, it is at least a good diagnostic for revealing non-uniformity. In my brief research, I found that the standard way for generating approximately uniformly distributed Hamiltonian paths involves some form of shuffling mechanism [1]. The commonly adopted method traces back to a 1980s Journal of Chemical Physics paper on polymer simulations [2], and it is known as backbiting.
 
-Backbiting offers a different way of approaching the problem. Instead of constructing a random Hamiltonian path from scratch, we start with any valid Hamiltonian path, a deterministic or highly structured and biased one (as the ones we produced so far). We then modify it in place several times, applying small local moves that shuffles the path while preserving its Hamiltonian property. This iterative modification process naturally forms a Markov chain: each new path is obtained by a simple random move applied to the current one, with no memory of the steps that came before. Over many iterations, these random local rearrangements tend to explore the set of all Hamiltonian paths, and in a way that resembles a uniform sampling procedure.
+Backbiting offers a different way of approaching the problem. Instead of constructing a random Hamiltonian path from scratch, we start with any valid Hamiltonian path, a deterministic or highly structured and biased one (as the ones we produced so far). We then modify it in place several times, applying small local moves that shuffles the path while preserving its Hamiltonian property. This iterative modification process naturally forms a Markov chain: each new path is obtained by a simple random move applied to the current one, with no memory of the steps that came before. Over many iterations, these random local rearrangements tend to explore the set of all Hamiltonian paths, and in a way that resembles a uniform procedure.
 
 The backbiting operation works as follows:
  
@@ -475,7 +475,7 @@ void backbite(Points& path,
 ```
 
 
-To compare with the previous edge-count visualization, I again sampled $64^3$ paths on a  $8 \times 8$ with the same pyramid as before. This time, however, each sampled was processed with  $64 \log 64$ backbiting operations. As expected, the resulting visualization shows a much more uniform edge count.
+To compare with the previous edge-count visualization, I again generated $64^3$ paths on a  $8 \times 8$ with the same pyramid as before. This time, however, each path was processed with  $64 \log 64$ backbiting operations. As expected, the resulting visualization shows a much more uniform edge count.
 <div style="text-align:center;">
   <figure style="max-width:600px; margin: 0 auto;">
     <img src="edges_backbiting.png" alt="Expanded graph" style="width:100%;">
@@ -484,7 +484,7 @@ To compare with the previous edge-count visualization, I again sampled $64^3$ pa
 </div>
 
 
-Finally, the Figure below shows a random Hamiltonian path sampled on a $128 \times 128$ grid using the the iterative pyramid approach (`mn = {{2,2}, {2,2}, {2,2}, {2,2}, {2,2}, {2,2}, {2,2}}`) followed by $100 \times 128^2 \log 128^2$ backbiting operations. 
+Finally, the Figure below shows a random Hamiltonian path generated on a $128 \times 128$ grid using the the iterative pyramid approach (`mn = {{2,2}, {2,2}, {2,2}, {2,2}, {2,2}, {2,2}, {2,2}}`) followed by $100 \times 128^2 \log 128^2$ backbiting operations. 
 
 <div style="text-align:center;">
   <figure style="max-width:1000px; margin: 0 auto;">
