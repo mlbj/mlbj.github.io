@@ -1,5 +1,5 @@
 ---
-title: "Building an Android application with native Rust"
+title: "An Android application with native Rust"
 date: 2026-03-29
 tags: ["rust", "android"]
 draft: false
