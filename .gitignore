@@ -1,0 +1,57 @@
+# --- Hugo build output ---
+# The site is built and published by CI (.github/workflows/gh-pages.yml),
+# which runs `hugo --minify --cleanDestinationDir` and pushes ./public to gh-pages.
+# Nothing under public/ belongs on main.
+/public/
+/resources/_gen/
+/.hugo/
+/.hugo_build.lock
+hugo_stats.json
+.hugo_cache/
+
+# --- Local-only photo originals (full-res scans; the site uses hosted copies) ---
+/originals/
+
+# --- Local dev ---
+.env
+.env.local
+*.local
+
+# --- Node (asset tooling, if ever added) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- Python (post / figure scripts) ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# --- Editors ---
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+*~
+\#*\#
+.\#*
+
+# --- OS cruft ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# --- Scratch ---
+*.orig
+*.rej
+*.bak
+/tmp/
